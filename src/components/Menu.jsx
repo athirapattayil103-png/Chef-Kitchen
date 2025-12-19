@@ -18,6 +18,8 @@ const dishes = [
     available: "22 Bowls available",
     sizes: ["S", "M", "L"],
     image: leaf,
+    category:"our",
+    typ:"takeaway",
   },
   {
     id: 2,
@@ -27,6 +29,8 @@ const dishes = [
     available: "13 Bowls available",
     sizes: ["S", "M", "L"],
     image: noodle2,
+    category:"today",
+    typ:"dine-in",
   },
   {
     id: 3,
@@ -36,6 +40,8 @@ const dishes = [
     available: "17 Bowls available",
     sizes: ["S", "M", "L"],
     image: noodle3,
+    category:"south",
+    typ:"takeaway",
   },
   {
     id: 4,
@@ -45,6 +51,8 @@ const dishes = [
     available: "22 Bowls available",
     sizes: ["S", "M", "L"],
     image: noodle4,
+    category:"south",
+    typ:"takeaway",
   },
   {
     id: 5,
@@ -54,6 +62,8 @@ const dishes = [
     available: "13 Bowls available",
     sizes: ["S", "M", "L"],
     image: noodle5,
+     category:"today",
+    typ:"takeaway",
   },
   {
     id: 6,
@@ -63,6 +73,9 @@ const dishes = [
     available: "13 Bowls available",
     sizes: ["S", "M", "L"],
     image: noodle2,
+     category:"our",
+    typ:"dine-in",
+    
   },
   {
     id: 7,
@@ -72,6 +85,8 @@ const dishes = [
     available: "17 Bowls available",
     sizes: ["S", "M", "L"],
     image: noodle3,
+    category:"today",
+    typ:"dine-in",
   },
   {
     id: 8,
@@ -80,6 +95,8 @@ const dishes = [
     available: "22 Bowls available",
     sizes: ["S", "M", "L"],
     image: noodle4,
+    category:"our",
+    typ:"takeaway",
   },
   {
     id: 9,
@@ -88,6 +105,8 @@ const dishes = [
     available: "13 Bowls available",
     sizes: ["S", "M", "L"],
     image: noodle5,
+    category:"south",
+    typ:"takeaway",
   },
   {
     id: 10,
@@ -97,6 +116,8 @@ const dishes = [
     available: "22 Bowls available",
     sizes: ["S", "M", "L"],
     image: leaf,
+    category:"today",
+    typ:"dine-in",
   },
   {
     id: 11,
@@ -106,11 +127,10 @@ const dishes = [
     available: "22 Bowls available",
     sizes: ["S", "M", "L"],
     image: leaf,
+    category:"our",
+    typ:"takeaway",
   },
 ];
-
-
-
 
 const Menu = ({cart,setCart,showCart,setShowCart}) => {
   const [activeTab, setActiveTab] = useState("today");
@@ -118,6 +138,8 @@ const Menu = ({cart,setCart,showCart,setShowCart}) => {
   // const [showCart, setShowCart] = useState(false);
   const [showReceipt, setShowReceipt] = useState(false);
   const [now, setNow] = useState(new Date());
+  const [showToast, setShowToast] = useState(false);
+
   const [selectedSizes, setSelectedSizes] = useState({});
   const [searchText, setSearchText] = useState("");
   useEffect(() => {
@@ -133,46 +155,54 @@ const Menu = ({cart,setCart,showCart,setShowCart}) => {
       [dishId]: size,
     }));
   };
-
   const handleAdd = (dish) => {
-    const size =
-      dish.selectedSize ||
-      selectedSizes[dish.id] ||
-      dish.sizes?.[0] ||
-      "M";
+  const size =
+    dish.selectedSize ||
+    selectedSizes[dish.id] ||
+    dish.sizes?.[0] ||
+    "M";
 
-    setCart((prev) => {
-      const existing = prev.find(
-        (item) => item.id === dish.id && item.size === size
+  setCart((prev) => {
+    const existing = prev.find(
+      (item) => item.id === dish.id && item.size === size
+    );
+
+    if (existing) {
+      return prev.map((item) =>
+        item.id === dish.id && item.size === size
+          ? { ...item, qty: item.qty + 1 }
+          : item
       );
+    }
 
-      if (existing) {
-        return prev.map((item) =>
-          item.id === dish.id && item.size === size
-            ? { ...item, qty: item.qty + 1 }
-            : item
-        );
-      }
+    return [
+      ...prev,
+      {
+        id: dish.id,
+        name: dish.name,
+        price: dish.price,
+        image: dish.image,
+        qty: 1,
+        size,
+      },
+    ];
+  });
 
-      return [
-        ...prev,
-        {
-          id: dish.id,
-          name: dish.name,
-          price: dish.price,
-          image: dish.image,
-          qty: 1,
-          size,
-        },
-      ];
-    });
-  };
-  
-const filteredDishes = dishes.filter((dish) =>
-  dish.name.toLowerCase().includes(searchText.toLowerCase())
-);
+  // ✅ SHOW TOAST
+  setShowToast(true);
+  setTimeout(() => setShowToast(false), 2000);
+};
 
+const filteredDishes = dishes.filter((dish) => {
+  const matchCategory =
+    activeTab === "all" || dish.category === activeTab;
 
+  const matchSearch = dish.name
+    .toLowerCase()
+    .includes(searchText.toLowerCase());
+
+  return matchCategory && matchSearch;
+});
 
   return (
     <>
@@ -184,44 +214,46 @@ const filteredDishes = dishes.filter((dish) =>
         <div className="h-screen flex flex-col bg-[#1f2430] text-white relative">
           {/* HEADER */}
           <div className="sticky top-0 z-40 bg-[#1f2430] border-b border-gray-700">
+            
             <div className="flex justify-between items-center px-6 py-4">
-              <div>
-                <h1 className="text-xl font-semibold">Chef Kitchen</h1>
-                <p className="text-sm text-gray-400 hidden sm:block">
-                  {now.toLocaleDateString("en-US", {
-                    weekday: "long",
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}{" "}
-                  •{" "}
-                  {now.toLocaleTimeString("en-US", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    second: "2-digit",
-                  })}
-                </p>
-              </div>
+  {/* LEFT: TITLE */}
+  <div>
+    <h1 className="text-xl font-semibold">Chef Kitchen</h1>
+    <p className="text-sm text-gray-400 hidden sm:block">
+      {now.toLocaleDateString("en-US", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })}{" "}
+      •{" "}
+      {now.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      })}
+    </p>
+  </div>
 
-              <div className="hidden md:flex items-center bg-[#2b3140] px-3 py-2 rounded-lg text-sm">
-                <FaSearch className="text-gray-400 mr-2" />
-                {/* <input
-                  placeholder="Search food..."
-                  className="bg-transparent outline-none"
-                /> */}
+  {/* RIGHT: SEARCH BAR (ADD THIS) */}
+  <div className="flex items-center gap-3">
+    <div className="flex items-center bg-[#1a1f2e] px-4 py-2 rounded-xl w-[320px] border border-gray-700">
+      <FaSearch className="text-gray-400 mr-2" />
+      <input
+        type="text"
+        placeholder="Search for food, coffee, etc..."
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
+        className="bg-transparent outline-none text-sm text-white w-full placeholder-gray-400"
+      />
+    </div>
+  </div>
+</div>
 
-                <input
-  placeholder="Search food..."
-  value={searchText}
-  onChange={(e) => setSearchText(e.target.value)}
-  className="bg-transparent outline-none"/>
-
-              </div>
-            </div>
 
             {/* Tabs */}
-            <div className="flex gap-6 px-6 text-sm">
-              {["today", "our", "south"].map((tab) => (
+            <div className="flex gap-6 px-6 text-sm whitespace-nowrap">
+              {["all","today", "our", "south"].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -231,11 +263,13 @@ const filteredDishes = dishes.filter((dish) =>
                       : "text-gray-400"
                   }`}
                 >
-                  {tab === "today"
-                    ? "Today Special"
-                    : tab === "our"
-                    ? "Our Specials"
-                    : "South Indian Special"}
+{tab === "all"
+  ? "All"
+  : tab === "today"
+  ? "Today Special"
+  : tab === "our"
+  ? "Our Specials"
+  : "South Indian Special"}
                 </button>
               ))}
             </div>
@@ -252,25 +286,19 @@ const filteredDishes = dishes.filter((dish) =>
 
           {/* MENU LIST */}
           <div className="flex-1 overflow-y-auto no-scrollbar px-6 py-6">
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-              {dishes.map((dish) => {
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+              {filteredDishes.length === 0 && (
+  <p className="col-span-full text-center text-gray-400">
+    No dishes found
+  </p>
+)}
+
+             {filteredDishes.map((dish) => {
                 // const added = cart.some((i) => i.id === dish.id);
-                const selectedSize =
-  selectedSizes[dish.id] || dish.sizes?.[0] || "M";
-
-const added = cart.some(
-  (i) => i.id === dish.id && i.size === selectedSize
-);
-
-
-                return (
-                  
-
-
-                  <div
-  key={dish.id}
-  className="relative bg-[#232837] rounded-2xl pt-16 pb-20 px-5"
->
+                const selectedSize =selectedSizes[dish.id] || dish.sizes?.[0] || "M";
+                const added = cart.some((i) => i.id === dish.id && i.size === selectedSize);
+                 return (
+             <div key={dish.id} className="relative bg-[#232837] rounded-2xl pt-16 pb-20 px-5">
   {/* Floating Image */}
   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
     <img
@@ -279,8 +307,6 @@ const added = cart.some(
       className="w-24 h-24 rounded-full shadow-lg bg-[#1f2430]"
     />
   </div>
-
-
                     <h3 className="text-sm mt-4 text-center font-medium">
                       {dish.name}
                     </h3>
@@ -362,6 +388,13 @@ const added = cart.some(
       {/* {showReceipt && (
         
       )} */}
+      {/* SUCCESS TOAST */}
+{showToast && (
+  <div className="fixed top-6 right-6 z-50 bg-green-600 text-white px-4 py-3 rounded-lg shadow-lg animate-fade-in">
+    ✅ Order added successfully
+  </div>
+)}
+
     </>
   );
 };

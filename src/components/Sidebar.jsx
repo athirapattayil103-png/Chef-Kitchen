@@ -117,17 +117,19 @@ import OfferIcon from "../assets/offer.svg?react";
 import LikeIcon from "../assets/like.svg?react";
 import MaleIcon from "../assets/male.svg?react";
 import NotifyIcon from "../assets/notify.svg?react";
-import ExitIcon from "../assets/exit.svg?react";
+import ExitIcon from "../assets/logout.svg";
+import { useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
   const [active, setActive] = useState(0);
+  const navigate = useNavigate();
 
   const items = [
-    { Icon: HomeIcon, alt: "Home" },
-    { Icon: OfferIcon, alt: "Offers" },
-    { Icon: LikeIcon, alt: "Likes" },
-    { Icon: MaleIcon, alt: "Profile" },
-    { Icon: NotifyIcon, alt: "Notifications" },
+    { Icon: HomeIcon, alt: "Home" ,path:"/Menu"},
+    { Icon: OfferIcon, alt: "Offers" ,path:"/offers"},
+    { Icon: LikeIcon, alt: "Likes",path:"/likes" },
+    { Icon: MaleIcon, alt: "Profile",path:"/profile" },
+    { Icon: NotifyIcon, alt: "Notifications",path:"/notification" },
   ];
 
   return (
@@ -141,7 +143,7 @@ const Sidebar = () => {
         {items.map((item, i) => (
           <button
             key={i}
-            onClick={() => setActive(i)}
+            onClick={() => navigate(item.path)}
             className="relative w-12 h-12 flex items-center justify-center"
           >
             {/* ACTIVE CURVE */}
@@ -183,8 +185,11 @@ const Sidebar = () => {
       </div>
 
       {/* LOGOUT */}
-      <button className="mt-auto w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/5">
-        <ExitIcon className="w-5 h-5 text-[#FF9F43]" />
+      <button 
+      onClick={() => navigate("/")}
+      className="mt-auto w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/5">
+        {/* <ExitIcon className="w-5 h-5 text-[#FF9F43]" /> */}
+        <img src={ExitIcon} alt="Logout" className="w-5 h-5"/>
       </button>
     </aside>
   );
