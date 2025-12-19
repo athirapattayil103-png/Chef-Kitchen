@@ -1,9 +1,8 @@
-
-
-
 import { IoClose, IoTrashOutline } from "react-icons/io5";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+
+// TODO : split the code to components
 
 const OrderPanel = ({ orders, setOrders, showCart, onClose }) => {
   const [orderType, setOrderType] = useState("Dine In");
@@ -30,10 +29,7 @@ const OrderPanel = ({ orders, setOrders, showCart, onClose }) => {
         item.id === id && item.size === size
           ? {
               ...item,
-              qty:
-                type === "inc"
-                  ? item.qty + 1
-                  : Math.max(1, item.qty - 1),
+              qty: type === "inc" ? item.qty + 1 : Math.max(1, item.qty - 1),
             }
           : item
       )
@@ -42,9 +38,7 @@ const OrderPanel = ({ orders, setOrders, showCart, onClose }) => {
 
   const handleDelete = (id, size) => {
     setOrders((prev) =>
-      prev.filter(
-        (item) => !(item.id === id && item.size === size)
-      )
+      prev.filter((item) => !(item.id === id && item.size === size))
     );
   };
 
@@ -62,11 +56,10 @@ const OrderPanel = ({ orders, setOrders, showCart, onClose }) => {
     });
   };
 
-  console.log(showCart)
+  console.log(showCart);
 
-
-  if(!showCart) {
- return null
+  if (!showCart) {
+    return null;
   }
   return (
     <aside
@@ -78,9 +71,7 @@ const OrderPanel = ({ orders, setOrders, showCart, onClose }) => {
       {/* ================= HEADER ================= */}
       <div className="sticky top-0 bg-[#1e1b2e] p-4 border-b border-white/10">
         <div className="flex justify-between items-center">
-          <h2 className="text-lg font-semibold truncate">
-            Orders #34562
-          </h2>
+          <h2 className="text-lg font-semibold truncate">Orders #34562</h2>
           <button onClick={onClose}>
             <IoClose size={20} />
           </button>
@@ -113,9 +104,7 @@ const OrderPanel = ({ orders, setOrders, showCart, onClose }) => {
       {/* ================= ITEMS ================= */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5 scrollbar-hide">
         {orders?.length === 0 && (
-          <p className="text-center text-gray-400 text-sm">
-            Cart is empty
-          </p>
+          <p className="text-center text-gray-400 text-sm">Cart is empty</p>
         )}
 
         {orders?.map((item, idx) => (
@@ -128,12 +117,8 @@ const OrderPanel = ({ orders, setOrders, showCart, onClose }) => {
               />
 
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">
-                  {item.name}
-                </p>
-                <p className="text-xs text-gray-400">
-                  Size: {item.size}
-                </p>
+                <p className="text-sm font-medium truncate">{item.name}</p>
+                <p className="text-xs text-gray-400">Size: {item.size}</p>
                 <p className="text-xs text-orange-400 font-semibold">
                   ${item.price}
                 </p>
@@ -141,9 +126,7 @@ const OrderPanel = ({ orders, setOrders, showCart, onClose }) => {
 
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() =>
-                    handleQty(item.id, item.size, "dec")
-                  }
+                  onClick={() => handleQty(item.id, item.size, "dec")}
                   className="bg-[#2a273a] w-7 h-7 rounded"
                 >
                   −
@@ -154,9 +137,7 @@ const OrderPanel = ({ orders, setOrders, showCart, onClose }) => {
                 </div>
 
                 <button
-                  onClick={() =>
-                    handleQty(item.id, item.size, "inc")
-                  }
+                  onClick={() => handleQty(item.id, item.size, "inc")}
                   className="bg-[#2a273a] w-7 h-7 rounded"
                 >
                   +
@@ -174,9 +155,7 @@ const OrderPanel = ({ orders, setOrders, showCart, onClose }) => {
                 className="flex-1 bg-[#2a273a] px-3 py-2 rounded-lg text-xs outline-none"
               />
               <button
-                onClick={() =>
-                  handleDelete(item.id, item.size)
-                }
+                onClick={() => handleDelete(item.id, item.size)}
                 className="border border-orange-500 p-2 rounded-lg"
               >
                 <IoTrashOutline className="text-orange-400" />

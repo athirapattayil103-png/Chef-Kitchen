@@ -9,6 +9,13 @@ import noodle3 from "../assets/noodle3.svg";
 import noodle4 from "../assets/noodle4.svg";
 import noodle5 from "../assets/noodle5.svg";
 import OrderPanel from "./OrderPanel";
+
+// TODO : Create a new folder named "CONSTANTS" and move all the constants to that folder [eg:dishes]
+// TODO : Use context for the state management 
+// TODO : SPlit this code into more component for readability and maintainability
+// TODO : Make the entier applicaion responsive in every screen 
+// TODO : Rmove console message in production mode
+
 const dishes = [
   {
     id: 1,
@@ -109,10 +116,7 @@ const dishes = [
   },
 ];
 
-
-
-
-const Menu = ({cart,setCart,showCart,setShowCart}) => {
+const Menu = ({ cart, setCart, showCart, setShowCart }) => {
   const [activeTab, setActiveTab] = useState("today");
   // const [cart, setCart] = useState([]);
   // const [showCart, setShowCart] = useState(false);
@@ -136,10 +140,7 @@ const Menu = ({cart,setCart,showCart,setShowCart}) => {
 
   const handleAdd = (dish) => {
     const size =
-      dish.selectedSize ||
-      selectedSizes[dish.id] ||
-      dish.sizes?.[0] ||
-      "M";
+      dish.selectedSize || selectedSizes[dish.id] || dish.sizes?.[0] || "M";
 
     setCart((prev) => {
       const existing = prev.find(
@@ -167,12 +168,10 @@ const Menu = ({cart,setCart,showCart,setShowCart}) => {
       ];
     });
   };
-  
-const filteredDishes = dishes.filter((dish) =>
-  dish.name.toLowerCase().includes(searchText.toLowerCase())
-);
 
-
+  const filteredDishes = dishes.filter((dish) =>
+    dish.name.toLowerCase().includes(searchText.toLowerCase())
+  );
 
   return (
     <>
@@ -211,11 +210,11 @@ const filteredDishes = dishes.filter((dish) =>
                 /> */}
 
                 <input
-  placeholder="Search food..."
-  value={searchText}
-  onChange={(e) => setSearchText(e.target.value)}
-  className="bg-transparent outline-none"/>
-
+                  placeholder="Search food..."
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  className="bg-transparent outline-none"
+                />
               </div>
             </div>
 
@@ -256,30 +255,25 @@ const filteredDishes = dishes.filter((dish) =>
               {dishes.map((dish) => {
                 // const added = cart.some((i) => i.id === dish.id);
                 const selectedSize =
-  selectedSizes[dish.id] || dish.sizes?.[0] || "M";
+                  selectedSizes[dish.id] || dish.sizes?.[0] || "M";
 
-const added = cart.some(
-  (i) => i.id === dish.id && i.size === selectedSize
-);
-
+                const added = cart.some(
+                  (i) => i.id === dish.id && i.size === selectedSize
+                );
 
                 return (
-                  
-
-
                   <div
-  key={dish.id}
-  className="relative bg-[#232837] rounded-2xl pt-16 pb-20 px-5"
->
-  {/* Floating Image */}
-  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-    <img
-      src={dish.image}
-      alt={dish.name}
-      className="w-24 h-24 rounded-full shadow-lg bg-[#1f2430]"
-    />
-  </div>
-
+                    key={dish.id}
+                    className="relative bg-[#232837] rounded-2xl pt-16 pb-20 px-5"
+                  >
+                    {/* Floating Image */}
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                      <img
+                        src={dish.image}
+                        alt={dish.name}
+                        className="w-24 h-24 rounded-full shadow-lg bg-[#1f2430]"
+                      />
+                    </div>
 
                     <h3 className="text-sm mt-4 text-center font-medium">
                       {dish.name}
