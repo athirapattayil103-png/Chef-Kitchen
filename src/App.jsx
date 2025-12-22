@@ -10,6 +10,12 @@ import Offers from "./components/offers";
 import Likes from "./components/Likes";
 import Profile from "./components/Profile";
 
+// TODO : Use the same font style as in the figma
+// TODO : Filter options are not working [Category,orderType,Search]
+// TODO : Set the sidebar design exactly like in the figma [ logout icon ]
+// TODO : <Route path="/menu" element={<Menu />} /> this route is not working , if it is unused one then remove it 
+// TODO : Create a new folder named "Pages" and move pages from the components 
+
 const App = () => {
   return (
     <Routes>
