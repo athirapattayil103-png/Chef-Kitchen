@@ -26,3 +26,16 @@
 .animate-fade-in {
   animation: fade-in 0.3s ease-out;
 }
+body {
+  @apply font-barlow;
+}
+/* COMPLETELY HIDE SCROLLBAR */
+.hide-scrollbar::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE & Edge */
+  scrollbar-width: none;    /* Firefox */
+}

@@ -1,32 +1,55 @@
+
 import { useState } from "react";
-import Menu from "./Menu";
+import Menu from "../pages/Menu";
 import OrderPanel from "./OrderPanel";
 import Sidebar from "./Sidebar";
-
+import Receipt from "./Receipt";
 const Display = () => {
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
-  return (
-    <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-black">
-      {/* Sidebar */}
-      <div className="hidden md:block">
-        <Sidebar />
-      </div>
+  const [orderType, setOrderType] = useState("Dine In");
+const [receiptData, setReceiptData] = useState(null);
 
-      <div className="flex-1 overflow-y-auto hide-scrollbar">
+  return (
+    <div className="flex h-screen bg-black overflow-hidden">
+      {/* SIDEBAR */}
+     <div className="hidden md:block sticky top-0 h-screen">
+  <Sidebar />
+</div>
+
+
+      {/* MENU */}
+<div className="flex-1 overflow-hidden">
         <Menu
-        cart={cart}
-        setCart={setCart}
-        setShowCart={setShowCart}
-        showCart={showCart}
+          cart={cart}
+          setCart={setCart}
+          showCart={showCart}
+          setShowCart={setShowCart}
+          orderType={orderType}
+          setOrderType={setOrderType}
         />
       </div>
-      <OrderPanel
-        onClose={() => setShowCart(false)}
-        orders={cart}
-        setOrders={setCart}
-        showCart={showCart}
-      />
+
+      {/* ORDER PANEL */}
+      {showCart && (
+        <OrderPanel
+          orders={cart}
+          setOrders={setCart}
+          showCart={showCart}
+          onClose={() => setShowCart(false)}
+          orderType={orderType}
+          setOrderType={setOrderType}
+            onOrderPlaced={(data) => setReceiptData(data)}
+
+        />
+        
+      )}
+      {receiptData && (
+  <Receipt
+    data={receiptData}
+    onClose={() => setReceiptData(null)}
+  />
+)}
     </div>
   );
 };
