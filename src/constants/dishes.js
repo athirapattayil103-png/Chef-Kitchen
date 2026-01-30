@@ -29,7 +29,7 @@ import leaf from "../assets/leaf.svg";
   },
   {
     id: 3,
-    name: "Spicy instant noodle with omelette",
+    name: "Spicy instant noodle  omelette",
     oldPrice: 32,
     price: 25,
     available: "17 Bowls available",

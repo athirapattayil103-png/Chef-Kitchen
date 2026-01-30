@@ -1,78 +1,59 @@
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { IoCartOutline } from "react-icons/io5";
+
 import MenuHeader from "../components/MenuHeader";
 import DishCard from "../components/DishCard";
-import { dishes } from "../constants/dishes";
+import OrderPanel from "../components/OrderPanel";
+import Receipt from "../components/Receipt";
 
-const Menu = ({
-  cart,
-  setCart,
-  showCart,
-  setShowCart,
-  orderType,
-  setOrderType,
-}) => {
+import { dishes } from "../constants/dishes";
+import { useMenu } from "../context/MenuContext";
+
+const Menu = () => {
+  const {
+    cart,
+    setCart,
+    addToCart,
+    orderType,
+    setOrderType,
+  } = useMenu();
+
   const [activeTab, setActiveTab] = useState("all");
   const [now, setNow] = useState(new Date());
-  const [showToast, setShowToast] = useState(false);
   const [selectedSizes, setSelectedSizes] = useState({});
   const [searchText, setSearchText] = useState("");
   const [showOrderType, setShowOrderType] = useState(false);
 
+  // 🛒 CART + RECEIPT STATES
+  const [showCart, setShowCart] = useState(false);
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [receiptData, setReceiptData] = useState(null);
+
+  // 🕒 LIVE TIME
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
+  // 🔴 Clear cart on first load
+  useEffect(() => {
+    setCart([]);
+    localStorage.removeItem("cart");
+  }, []);
+
+  // 📏 SIZE SELECT
   const handleSizeSelect = (dishId, size) => {
-    setSelectedSizes((prev) => ({
-      ...prev,
-      [dishId]: size,
-    }));
+    setSelectedSizes((prev) => ({ ...prev, [dishId]: size }));
   };
 
+  // ➕ ADD TO CART
   const handleAdd = (dish) => {
-  const size = selectedSizes[dish.id];
+    const size = selectedSizes[dish.id] || dish.sizes?.[0];
+    if (!size) return;
+    addToCart(dish, size);
+  };
 
-  // 🚨 SIZE NOT SELECTED
-  if (!size) {
-    alert("Please select your size");
-    return;
-  }
-
-  setCart((prev) => {
-    const existing = prev.find(
-      (item) => item.id === dish.id && item.size === size
-    );
-
-    if (existing) {
-      return prev.map((item) =>
-        item.id === dish.id && item.size === size
-          ? { ...item, qty: item.qty + 1 }
-          : item
-      );
-    }
-
-    return [
-      ...prev,
-      {
-        id: dish.id,
-        name: dish.name,
-        price: dish.price,
-        image: dish.image,
-        qty: 1,
-        size,
-        note:"",
-      },
-    ];
-  });
-
-  // ✅ SUCCESS TOAST
-  setShowToast(true);
-  setTimeout(() => setShowToast(false), 2000);
-};
-
-
+  // 🔍 FILTER
   const filteredDishes = dishes.filter((dish) => {
     const matchCategory =
       activeTab === "all" || dish.category === activeTab;
@@ -86,88 +67,84 @@ const Menu = ({
 
   return (
     <>
-      <div className="h-screen flex flex-col bg-[#1f2430] text-white">
-       
+      {/* ================= MAIN LAYOUT ================= */}
+      <div className="h-screen bg-[#1f2430] text-white flex overflow-x-hidden">
+
+        {/* ================= LEFT CONTENT ================= */}
+        <div
+          className={`flex-1 flex flex-col transition-all duration-300 ${
+            showCart ? "pr-[420px]" : "pr-0"
+          }`}
+        >
           <MenuHeader
-  now={now}
-  searchText={searchText}
-  setSearchText={setSearchText}
-  activeTab={activeTab}
-  setActiveTab={setActiveTab}
-/>
+            now={now}
+            searchText={searchText}
+            setSearchText={setSearchText}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+          />
 
+          {/* ORDER TYPE */}
+          <div className="flex justify-between items-center px-6 mt-6">
+            <h2 className="text-lg font-semibold">Choose Dishes</h2>
 
-{/* ================= CHOOSE DISHES HEADER ================= */}
-<div className="flex justify-between items-center px-6 mt-6 relative">
-  <h2 className="text-lg font-semibold">Choose Dishes</h2>
+            <div className="relative overflow-visible z-50">
+              <button
+                onClick={() => setShowOrderType(!showOrderType)}
+                className="bg-[#2b3140] px-4 py-2 rounded-lg text-sm"
+              >
+                {orderType} ⌄
+              </button>
 
-  {/* ORDER TYPE SELECT */}
-  <div className="relative">
-    <button
-      onClick={() => setShowOrderType(!showOrderType)}
-      className="flex items-center gap-2 bg-[#2b3140] px-4 py-2 rounded-lg text-sm border border-gray-600"
-    >
-      {orderType}
-      <span className="text-xs">⌄</span>
-    </button>
+              {showOrderType && (
+                <div className="absolute right-0 mt-2 w-36 bg-[#232837] rounded-lg z-50">
+                  {["Dine In", "Take away", "Delivery"].map((type) => (
+                    <button
+                      key={type}
+                      onClick={() => {
+                        setOrderType(type);
+                        setShowOrderType(false);
+                      }}
+                      className="block w-full px-4 py-2 text-sm hover:bg-[#2b3140]"
+                    >
+                      {type}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
 
-    {/* DROPDOWN */}
-    {showOrderType && (
-      <div className="absolute right-0 mt-2 w-36 bg-[#232837] rounded-lg shadow-xl overflow-hidden z-50">
-        {["Dine In", "Take away", "Delivery"].map((type) => (
-          <button
-            key={type}
-            onClick={() => {
-              setOrderType(type);
-              setShowOrderType(false);
-            }}
-            className={`w-full text-left px-4 py-2 text-sm hover:bg-[#2b3140] ${
-              orderType === type
-                ? "text-orange-400"
-                : "text-white"
-            }`}
-          >
-            {type}
-          </button>
-        ))}
-      </div>
-    )}
-  </div>
-</div>
+          {/* DISH GRID */}
+          <div className="flex-1 overflow-y-auto hide-scrollbar px-6 py-6">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+              {filteredDishes.map((dish) => {
+                const selectedSize =
+                  selectedSizes[dish.id] || dish.sizes?.[0];
 
-
-
-
-        {/* MENU */}
-  <div className="flex-1 overflow-y-auto hide-scrollbar px-6 py-6">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
-            {filteredDishes.map((dish) => {
-  const selectedSize =
-    selectedSizes[dish.id] || dish.sizes?.[0] || "M";
-
-  const added = cart.some(
-    (i) => i.id === dish.id && i.size === selectedSize
-  );
-
-  return (
-    <DishCard
-      key={dish.id}
-      dish={dish}
-      selectedSize={selectedSize}
-      onSizeSelect={handleSizeSelect}
-      onAdd={handleAdd}
-      added={added}
-    />
-  );
-})}
-
+                return (
+                  <DishCard
+                    key={dish.id}
+                    dish={dish}
+                    selectedSize={selectedSize}
+                    onSizeSelect={handleSizeSelect}
+                    onAdd={handleAdd}
+                    added={cart.some(
+                      (i) =>
+                        i.id === dish.id &&
+                        i.size === selectedSize
+                    )}
+                  />
+                );
+              })}
+            </div>
           </div>
         </div>
 
         {/* CART BUTTON */}
         <button
           onClick={() => setShowCart(true)}
-          className="fixed bottom-6 right-6 bg-[#F99147] p-4 rounded-full shadow-lg"
+          className="fixed bottom-6 right-6 z-40 bg-[#F99147] p-4 rounded-full"
         >
           <IoCartOutline size={24} />
           {cart.length > 0 && (
@@ -176,15 +153,33 @@ const Menu = ({
             </span>
           )}
         </button>
-      
       </div>
 
-      {showToast && (
-  <div className="fixed top-5 right-5 z-50 bg-green-600 text-white px-5 py-3 rounded-xl shadow-lg flex items-center gap-2 animate-fade">
-    ✅ Order added successfully
-  </div>
-)}
+      {/* ================= ORDER PANEL ================= */}
+      <OrderPanel
+        orders={cart}
+        setOrders={setCart}
+        showCart={showCart}
+        onClose={() => setShowCart(false)}
+        orderType={orderType}
+        setOrderType={setOrderType}
+        onOrderPlaced={(data) => {
+          setReceiptData(data);
+          setShowReceipt(true);
+        }}
+      />
 
+      {/* ================= RECEIPT ================= */}
+      {showReceipt && (
+        <Receipt
+          data={receiptData}
+          onClose={() => {
+            setShowReceipt(false);
+            setCart([]);
+            localStorage.removeItem("cart");
+          }}
+        />
+      )}
     </>
   );
 };
